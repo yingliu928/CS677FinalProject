@@ -1,1 +1,2 @@
-# CS677FinalProject
+# Image Histogram Along A Direction with CUDA
+## Problem Description
