@@ -94,7 +94,7 @@ int main( int argc, char **argv )
 int outputX, outputY;
 double realAngle = -angle;
 int originX = 0;
-int originY = 0;
+int originY = 200;
 getNewXY(originX,originY, xsize, ysize, realAngle, &outputX, &outputY);
 printf("(%d, %d) rotated to newX: %d, newY: %d \n", originX,originY,outputX, outputY);
 //output the paddledInput
@@ -117,7 +117,7 @@ cudaEventDestroy(start);
 cudaEventDestroy(stop);
 //output rotated image
 write_ppm( "rotated_gold.ppm", diaLen, diaLen, 255, h_rotated);
-//write_CSV("rotated_gold.csv",diaLen,diaLen, h_rotated);
+write_CSV("rotated_gold.csv",diaLen,diaLen, h_rotated);
 //write_CSV("picture.csv",xsize,ysize, pic);
 
 //initialization h_BinsCPU
@@ -174,7 +174,7 @@ cudaMalloc((void**)&d_rotated_naive,rotate_size);
 cudaMemcpy(d_Input,h_Input,rotate_size,cudaMemcpyHostToDevice);
 
 //kernel dimension
-int blockSize = 32;
+int blockSize = 8;
 dim3 blockDim(blockSize,blockSize,1);
 int gridSize = (diaLen + blockSize -1)/blockSize;
 dim3 gridDim(gridSize,gridSize,1);
@@ -353,7 +353,6 @@ __global__ void rotation_kernel_naive(unsigned int *input,unsigned int *output,i
   if(orgX>=0 && orgX < width && orgY>=0 && orgY<height){
     output[index] = input[ orgY * width + orgX];
   }
-
 }
 //--------rotation kernel 2----------------------------------------
 __global__ void rotation_kernel_2(unsigned int *input,unsigned int *output,int width, int height,double angle){
@@ -416,11 +415,9 @@ void matrixRotation(unsigned int *input, unsigned int *output, int width, int he
       int orgY = (int)(sin(angle) * ((double)x -xCenter) + cos(angle) * ((double)y - yCenter) + yCenter );
       if(orgX>=0 && orgX < width && orgY>=0 && orgY < height){
         output[y*width+x] = input[orgY * width +orgX];
-
       }
     }
   }
-
 }
 
 
